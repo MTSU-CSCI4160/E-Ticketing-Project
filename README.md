@@ -10,7 +10,7 @@ The following technologies will be used in the development of the project:
 - **HTML/CSS**: For creating the front-end user interface and styling the web pages.
 - **JavaScript**: To add interactivity to the user interface and manage client-side functionality.
 - **Node.js**: To build the back-end server, handling requests and responses between the client and database.
-- **React.js**: A JavaScript library for building user interfaces, providing a responsive and dynamic user experience.
+- **React.js**: A JavaScript library for building user interfaces, providing a responsive and dynamic user experience. 
 
 ## Features (Planned)
 - User registration and login
