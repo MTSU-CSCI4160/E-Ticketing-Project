@@ -12,7 +12,6 @@ The following technologies will be used in the development of the project:
 - **Node.js**: To build the back-end server, handling requests and responses between the client and database.
 - **Express.js**: A web application framework for Node.js to simplify the server development process.
 - **React.js**: A JavaScript library for building user interfaces, providing a responsive and dynamic user experience.
-- **JWT (JSON Web Tokens)**: For secure user authentication and authorization.
 
 ## Features (Planned)
 - User registration and login
