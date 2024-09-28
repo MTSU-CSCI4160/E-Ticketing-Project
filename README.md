@@ -1,7 +1,7 @@
 # E-Ticketing Project
 
 ## Overview
-The E-Ticketing Project is an upcoming initiative aimed at providing a user-friendly platform for purchasing and managing tickets for events such as concerts, movies, sports, and more. This project will utilize a variety of technologies to ensure a seamless experience for both users and administrators.
+The E-Ticketing Database Management System is designed to facilitate ticket management for events or transportation services. It provides a centralized database to manage customer information, ticket sales, and reservations, while ensuring data integrity and efficient querying.
 
 ## Technologies
 The following technologies will be used in the development of the project:
