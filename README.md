@@ -1,7 +1,7 @@
 # E-Ticketing Project
 
 ## Overview
-The E-Ticketing Database Management System is designed to facilitate ticket management for events or transportation services. It provides a centralized database to manage customer information, ticket sales, and reservations, while ensuring data integrity and efficient querying.
+The E-Ticketing Database Management System is designed to facilitate ticket management for events or transportation services. It provides a database to manage customer information, ticket sales, and reservations, while ensuring data integrity and efficient querying.
 
 ## Technologies
 The following technologies will be used in the development of the project:
