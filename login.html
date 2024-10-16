@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticketwave - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .login-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            max-width: 90%;
+            text-align: center;
+        }
+        
+        .login-container h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .login-container img {
+            width: 150px; /* Increased the width */
+            height: auto; /* Automatically adjusts the height */
+            margin-bottom: 20px;
+        }
+        
+        .login-form label {
+            display: block;
+            text-align: left; /* Left-align labels */
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .login-form input[type="text"],
+        .login-form input[type="password"],
+        .login-form button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 0 auto;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .login-form button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .login-form button:hover {
+            background-color: #218838;
+        }
+
+        .signup-link {
+            font-size: 14px;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .signup-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Ticketwave Login</h2>
+        <!-- Image inserted with local source -->
+        <img src="ticketwave.jpeg" alt="Ticketwave Logo">
+        
+        <form class="login-form" method="post" action="/login">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <button type="submit">Login</button>
+        </form>
+
+        <!-- Sign up option -->
+        <div class="signup-link">
+            Don't have an account? <a href="signup.html">Sign up here</a>
+        </div>
+    </div>
+</body>
+</html>
