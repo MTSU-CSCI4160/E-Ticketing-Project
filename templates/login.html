@@ -89,11 +89,12 @@
     <div class="login-container">
         <h2>Ticketwave Login</h2>
         <!-- Image inserted with local source -->
-        <img src="ticketwave.jpeg" alt="Ticketwave Logo">
+        <img src="{{ url_for('static', filename='ticketwave.jpeg') }}" alt="Ticketwave Logo">
+
         
         <form class="login-form" method="post" action="/login">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required>
             
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
