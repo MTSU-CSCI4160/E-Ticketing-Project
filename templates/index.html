@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticketwave - Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 10px; /* Adjusted padding */
+            text-align: center;
+            position: relative;
+            height: 75px; /* Fixed height to fit logo */
+        }
+
+        header img {
+            position: absolute;
+            top: 10px; /* Adjusted to fit within the header */
+            left: 20px;
+            width: 70px; /* Reduced size to fit the header */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 40px;
+            line-height: 75px; /* Center the text vertically within the header */
+        }
+
+        /* Positioning the signup and login buttons */
+        .header-buttons {
+            position: absolute;
+            top: 40px;
+            right: 20px;
+        }
+
+        .header-buttons a {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #28a745;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .header-buttons a:hover {
+            background-color: #218838;
+        }
+
+        .content {
+            text-align: center;
+            margin: 40px 20px;
+        }
+
+        .content h2 {
+            font-size: 28px;
+            color: #fff; /* Changed text color to white */
+        }
+
+        .content p {
+            font-size: 18px;
+            color: #fff; /* Changed text color to white */
+            margin-bottom: 30px;
+            max-width: 600px; /* This limits the width of the text */
+            margin: 0 auto;
+        }
+
+        .gallery {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+            gap: 20px; /* Add space between all images */
+        }
+
+        /* Center Image 1 */
+        .center-img {
+            width: calc(100% - 100px); /* Width dynamically adjusts, up to 600px */
+            max-width: 600px; /* Ensure the image doesn't exceed 600px */
+            height: auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin: 0 20px; /* Add horizontal margin to separate it from the side images */
+        }
+
+        /* Side images */
+        .side-img {
+            width: 360px;  /* Maintain original width for the side images */
+            height: 550px; /* Maintain fixed height */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin: 0 20px; /* Add horizontal margin to separate the side images from each other and the center image */
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <img src="{{ url_for('static', filename='ticketwave.jpeg') }}" alt="Ticketwave Logo">
+        <h1>𝙒𝙚𝙡𝙘𝙤𝙢𝙚 𝙩𝙤 𝙏𝙞𝙘𝙠𝙚𝙩𝙬𝙖𝙫𝙚</h1>
+
+        <!-- Sign Up and Login buttons in the top right corner -->
+        <div class="header-buttons">
+            <a href="/signup">Sign Up</a>
+            <a href="/login">Login</a>
+        </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <div class="content">
+        <h2>Your Gateway to Events</h2>
+        <p>Discover events, buy tickets, and manage your bookings effortlessly.</p>
+    </div>
+
+    <!-- Image Gallery Section -->
+    <div class="gallery">
+        <!-- Side image 2 -->
+        <img src="{{ url_for('static', filename='image2.jpg') }}" alt="Event Image 2" class="side-img">
+        
+        <!-- Centered Image 1 -->
+        <img src="{{ url_for('static', filename='image1.jpg') }}" alt="Event Image 1" class="center-img">
+        
+        <!-- Side image 3 -->
+        <img src="{{ url_for('static', filename='image3.jpg') }}" alt="Event Image 3" class="side-img">
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p> Developed by Deep Shah, Megh Patel, Om Patel</p>
+    </footer>
+</body>
+</html>
