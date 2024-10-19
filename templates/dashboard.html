@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticketwave - Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+            height: 75px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 30px;
+            line-height: 75px;
+        }
+
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Event section */
+        .events, .new-events {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            gap: 20px;
+            flex-wrap: wrap;  /* For better mobile responsiveness */
+        }
+
+        .event-box {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 30%;  /* Set width for desktop */
+            min-width: 250px;  /* Minimum width for mobile responsiveness */
+        }
+
+        .event-box h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .event-box p {
+            color: #666;
+        }
+
+        .profile-settings {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .profile-settings a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px;
+        }
+
+        .profile-settings a:hover {
+            background-color: #218838;
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .event-box {
+                width: 100%;  /* Full width on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <h1>Welcome to Your Dashboard, {{ user }}!</h1>
+    </header>
+
+    <!-- Main Content Section -->
+    <div class="content">
+        <h2>Your Upcoming Events</h2>
+
+        <!-- Upcoming Events Section -->
+        <div class="events">
+            {% for event in events %}
+                <div class="event-box">
+                    <h3>{{ event.name }}</h3>
+                    <p><strong>Date:</strong> {{ event.date }}</p>
+                    <p><strong>Location:</strong> {{ event.location }}</p>
+                </div>
+            {% else %}
+                <p>No upcoming events.</p>
+            {% endfor %}
+        </div>
+
+        <!-- New Events Section -->
+        <h2>Explore New Events</h2>
+        <div class="new-events">
+            {% for event in new_events %}
+                <div class="event-box">
+                    <h3>{{ event.name }}</h3>
+                    <p><strong>Date:</strong> {{ event.date }}</p>
+                </div>
+            {% else %}
+                <p>No new events to explore.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Profile Settings and Logout -->
+        <div class="profile-settings">
+            <a href="/profile">Update Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>Developed by Deep Shah, Megh Patel, Om Patel</p>
+    </footer>
+
+</body>
+</html>
