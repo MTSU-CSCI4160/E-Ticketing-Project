@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicketWave - Your Events</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background: linear-gradient(to right, #3498db, #8e44ad);
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        nav {
+            background-color: #2c3e50;
+            padding: 0.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        nav ul li {
+            margin-right: 20px;
+        }
+        nav ul li:last-child {
+            margin-right: 0;
+        }
+        nav ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: #3498db;
+        }
+        .container {
+            width: 80%;
+            margin: 2rem auto;
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .tab {
+            display: flex;
+            border-bottom: 2px solid #3498db;
+            margin-bottom: 2rem;
+        }
+        .tab button {
+            background-color: transparent;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+        }
+        .tab button:hover {
+            background-color: #ecf0f1;
+        }
+        .tab button.active {
+            background-color: #3498db;
+            color: #fff;
+        }
+        .tabcontent {
+            display: none;
+            padding: 1rem 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        table, th, td {
+            border: 1px solid #ecf0f1;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* Alternating row colors */
+        }
+        .form-group {
+            margin-bottom: 1.5rem; /* Spacing between form groups */
+        }
+        .form-group label {
+            display: block; /* Block display for labels */
+            margin-bottom: 0.5rem; /* Spacing below labels */
+            font-weight: bold; /* Bold labels */
+        }
+        .form-group input, .form-group textarea {
+            width: 100%; /* Full-width inputs */
+            padding: 0.75rem; /* Padding for inputs */
+            border: 1px solid #bdc3c7; /* Border for inputs */
+            border-radius: 4px; /* Rounded corners for inputs */
+            font-size: 1rem; /* Font size for inputs */
+        }
+        .btn {
+            display: inline-block; /* Inline block for buttons */
+            background-color: #3498db; /* Button background */
+            color: #fff; /* Button text color */
+            padding: 0.75rem 1.5rem; /* Padding for buttons */
+            border-radius: 4px; /* Rounded corners for buttons */
+             cursor:pointer; /* Pointer cursor on hover */
+             transition:.3s ease; /* Transition effect on hover */
+         } 
+         .btn:hover { 
+             background-color:#2980b9; /* Darker shade on hover */ 
+         } 
+         .btn-danger { 
+             background-color:#e74c3c; /* Danger button style */ 
+         } 
+         .btn-danger:hover { 
+             background-color:#c0392b; /* Darker shade on hover */ 
+         } 
+     </style>
+</head>
+<body>
+    <header>
+        <h1>TicketWave</h1>
+    </header>
+    
+    <nav>
+        <ul>
+           <li><a href="{{ url_for('homepage') }}">Home</a></li>
+           <li><a href="{{ url_for('events') }}">All Events</a></li>
+           <li><a href="{{ url_for('your_events') }}">Your Events</a></li>
+       </ul>
+       <ul>
+           <li><a href="{{ url_for('logout') }}">Logout</a></li>
+       </ul>
+   </nav>
+
+   <div class="container">
+       <h2>Your Events</h2>
+       
+       <div class="tab">
+           <button class="tablinks" onclick="openTab(event, 'CreateEvent')" id="defaultOpen">Create Event</button>
+           <button class="tablinks" onclick="openTab(event, 'ExistingEvents')">Existing Events</button>
+       </div>
+
+       <div id="CreateEvent" class="tabcontent">
+           <h3>Create a New Event</h3>
+           <form action="{{ url_for('create_event') }}" method="post">
+               <div class="form-group">
+                   <label for="event_name">Event Name:</label>
+                   <input type="text" id="event_name" name="event_name" required>
+               </div>
+               <div class="form-group">
+                   <label for="event_date">Event Date:</label>
+                   <input type="date" id="event_date" name="event_date" required>
+               </div>
+               <div class="form-group">
+                   <label for="location">Location:</label>
+                   <input type="text" id="location" name="location" required>
+               </div>
+               <div class="form-group">
+                   <label for="total_seats">Total Seats:</label>
+                   <input type="number" id="total_seats" name="total_seats" required min="1">
+               </div>
+               <!-- New Ticket Price Input Field -->
+               <div class="form-group">
+                   <label for="ticket_price">Ticket Price ($):</label>
+                   <input type="number" id="ticket_price" name="ticket_price" required step=".01" min="0">
+               </div>
+               <div class="form-group">
+                   <label for="description">Description:</label>
+                   <textarea id="description" name="description" rows="4"></textarea>
+               </div>
+               <button type="submit" class="btn">Create Event</button>
+           </form>
+       </div>
+
+       <div id="ExistingEvents" class="tabcontent">
+            <h3>Your Existing Events</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Total Seats</th>
+                        <th>Seats Left</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in user_events %}
+                    <tr>
+                        <td>{{ event.name }}</td>
+                        <td>{{ event.event_date.strftime('%B %d, %Y') }}</td> <!-- Ensure this formatting is correct -->
+                        <td>{{ event.location }}</td>
+                        <td>{{ event.total_seats }}</td>
+                        <td>{{ event.seats_left }}</td>
+                        <td>
+                            <!-- Change from event.id to event.event_id -->
+                            <a href="{{ url_for('edit_event', event_id=event.event_id) }}" class="btn">Edit</a>
+                            <a href="{{ url_for('delete_event', event_id=event.event_id) }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this event?');">Delete</a>
+                        </td> 
+                    </tr> 
+                    {% endfor %}
+                </tbody> 
+            </table> 
+        </div>              
+   </div>
+
+   <!-- JavaScript to handle tab switching -->
+   <script> 
+       function openTab(evt, tabName) { 
+           var i, tabcontent, tablinks; 
+           tabcontent = document.getElementsByClassName("tabcontent"); 
+           for (i = 0; i < tabcontent.length; i++) { 
+               tabcontent[i].style.display = "none"; 
+           } 
+           tablinks = document.getElementsByClassName("tablinks"); 
+           for (i = 0; i < tablinks.length; i++) { 
+               tablinks[i].className = tablinks[i].className.replace(" active", ""); 
+           } 
+           document.getElementById(tabName).style.display = "block"; 
+           evt.currentTarget.className += " active"; 
+       }
+
+       // Automatically open the default tab
+       document.getElementById("defaultOpen").click(); 
+   </script> 
+
+</body> 
