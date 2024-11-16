@@ -9,6 +9,21 @@ import bcrypt  # Importing bcrypt for password hashing
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Needed to keep sessions secure
 
+
+
+from functools import wraps
+from flask import session, redirect, url_for
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+
 # Database connection function
 def get_db_connection():
     connection = mysql.connector.connect(
@@ -24,41 +39,6 @@ def get_db_connection():
 def home():
     return render_template('login.html')
 
-@app.route('/homepage')
-def homepage():
-    return render_template('homepage.html')
-
-# Route for the login page
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password'].encode('utf-8')  # Encoding password for comparison
-        
-        # Connect to the database to verify user credentials
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-        user = cursor.fetchone()
-        cursor.close()
-        connection.close()
-
-        if user:
-            stored_password = user['password'].encode('utf-8')  # Fetching the hashed password from DB
-            if bcrypt.checkpw(password, stored_password):  # Verify password
-                # Store the user's info in session after successful login
-                session['user'] = user['first_name']  # Storing the first name for greeting
-                return redirect('/homepage')
-            else:
-                return "Invalid login credentials. Please try again."
-        else:
-            return "User not found. Please sign up."
-        
-        return redirect('/')
-
-    return render_template('login.html')
-
-# Route for the signup page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -87,40 +67,153 @@ def signup():
 
     return render_template('signup.html')
 
-# Route for the dashboard page
-@app.route('/dashboard')
-def dashboard():
-    if 'user' in session:
-        # Fetch upcoming events and new events from the database
+@app.route('/homepage')
+@login_required
+def homepage():
+    user_role = session.get('user_role')
+    
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    cursor.execute("""
+        SELECT name, event_date, location, seats_left 
+        FROM events 
+        WHERE event_date > CURDATE()
+        ORDER BY seats_left DESC 
+        LIMIT 3
+    """)
+    featured_events = cursor.fetchall()
+    
+    cursor.close()
+    connection.close()
+    
+    return render_template('homepage.html', user_role=user_role, featured_events=featured_events)
+
+
+@app.route('/events')
+@login_required
+def events():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    # Fetch events with available seats
+    cursor.execute("""
+        SELECT name, event_date, location 
+        FROM events 
+        WHERE seats_left > 0 
+        ORDER BY event_date ASC
+    """)
+    events = cursor.fetchall()
+    
+    cursor.close()
+    connection.close()
+
+    user_role = session.get('user_role')
+    return render_template('events.html', events=events, user_role=user_role)
+
+
+# Route for the login page
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password'].encode('utf-8')
+        
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-
-        # Fetch upcoming events (dummy query, modify based on your schema)
-        cursor.execute("SELECT * FROM events WHERE event_date > CURDATE() ORDER BY event_date ASC LIMIT 3")
-        upcoming_events = cursor.fetchall()
-
-        # Fetch new events (dummy query, modify based on your schema)
-        cursor.execute("SELECT * FROM events ORDER BY event_date ASC LIMIT 3")
-        new_events = cursor.fetchall()
-
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = cursor.fetchone()
         cursor.close()
         connection.close()
 
-        return render_template('dashboard.html', user=session['user'], events=upcoming_events, new_events=new_events)
-    else:
-        return redirect('/login')
+        if user and bcrypt.checkpw(password, user['password'].encode('utf-8')):
+            session['user'] = user['first_name']
+            session['user_role'] = user['role']
+            session['user_id'] = user['user_id']
+            return redirect(url_for('homepage'))
+        else:
+            return "Invalid login credentials. Please try again."
 
-# Route for profile update (if needed)
-@app.route('/profile', methods=['GET', 'POST'])
-def profile():
-    if 'user' in session:
-        if request.method == 'POST':
-            # Handle profile update here (e.g., update user information in the database)
-            pass
+    return render_template('login.html')
 
-        return render_template('profile.html', user=session['user'])
-    else:
-        return redirect('/login')
+@app.route('/your_events')
+@login_required
+def your_events():
+    if session.get('user_role') != 'user+organizer':
+        return redirect(url_for('homepage'))
+    
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    # Get the logged-in user's ID from the session
+    user_id = session.get('user_id')
+    
+    # Debugging output
+    print(f"Fetching events for user ID: {user_id}")
+    
+    # Fetch events created by the current user
+    cursor.execute("SELECT * FROM events WHERE organizer_id = %s ORDER BY event_date", (user_id,))
+    user_events = cursor.fetchall()
+    
+    # Debugging output to see fetched events
+    print(f"Fetched events: {user_events}")
+    
+    cursor.close()
+    connection.close()
+    
+    return render_template('your_events.html', user_events=user_events)
+
+
+@app.route('/create_event', methods=['POST'])
+@login_required
+def create_event():
+    if session.get('user_role') != 'user+organizer':
+        return redirect(url_for('homepage'))
+    
+    # Retrieve form data
+    event_name = request.form['event_name']
+    event_date = request.form['event_date']
+    location = request.form['location']
+    total_seats = request.form['total_seats']
+    ticket_price = request.form['ticket_price']  # Get ticket price from form
+    description = request.form['description']
+    
+    # Get the logged-in user's ID from the session
+    organizer_id = session.get('user_id')  # Assuming you stored user ID in session during login
+    
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    
+    # Check if the organizer_id exists in the users table
+    cursor.execute("SELECT COUNT(*) FROM users WHERE user_id = %s", (organizer_id,))
+    if cursor.fetchone()[0] == 0:
+        cursor.close()
+        connection.close()
+        return "Organizer ID does not exist.", 400  # Return an error if organizer ID is invalid
+    
+    # Insert the new event into the database
+    cursor.execute("""
+        INSERT INTO events (name, description, location, event_date, organizer_id, total_seats, seats_sold, ticket_price)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """, (event_name, description, location, event_date, organizer_id, total_seats, 0, ticket_price))  # seats_sold starts at 0
+    
+    connection.commit()
+    cursor.close()
+    connection.close()
+    
+    return redirect(url_for('your_events'))
+
+@app.route('/edit_event/<int:event_id>')
+@login_required
+def edit_event(event_id):
+    # Implement edit event logic
+    pass
+
+@app.route('/delete_event/<int:event_id>')
+@login_required
+def delete_event(event_id):
+    # Implement delete event logic
+    pass
 
 # Route to logout the user
 @app.route('/logout')
