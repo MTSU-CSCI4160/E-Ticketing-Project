@@ -176,13 +176,13 @@
        <ul>
            <li><a href="homepage">Home</a></li>
            <li><a href="events">Events</a></li>
-           <li><a href="#contact">Contact Us</a></li>
+           <li><a href="contact_us">Contact Us</a></li>
        </ul>
        <ul>
             {% if user_role == 'user+organizer' %}
             <li><a href="your_events">Your Events</a></li>
             {% endif %}
-            <li><a href="#yourtics">Your Tickets</a></li>
+            <li><a href="your_tickets">Your Tickets</a></li>
             <li><a href="{{ url_for('logout') }}">Logout</a></li>
        </ul>
     </nav>
