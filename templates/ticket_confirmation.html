@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Confirmation - TicketWave</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3a4cb1;
+            --secondary-color: #00c9a7;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .order-summary {
+            background-color: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .total {
+            font-weight: bold;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--primary-color);
+        }
+
+        .qr-code-container {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .qr-code-container img {
+            width: 200px; /* Adjust size as needed */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-color);
+        }
+
+        .btn-home {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+
+        .btn-home:hover {
+            background-color: #00b894; /* Darker shade on hover */
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ticket Confirmation</h1>
+        <p>Thank you for your purchase!</p>
+        
+        <div class="order-summary">
+            <h2>Ticket Details:</h2>
+            
+            <div class="order-item">
+                <span>Event:</span>
+                <span>{{ sale.event_name }}</span>
+            </div>
+            
+            <div class="order-item">
+                <span>Date:</span>
+                <span>{{ sale.event_date.strftime('%B %d, %Y at %I:%M %p') }}</span>
+            </div>
+
+            <div class="order-item">
+                <span>Number of Tickets:</span>
+                <span>{{ sale.number_of_tickets }}</span>
+            </div>
+
+            <div class="order-item">
+                <span>Total Price:</span>
+                <span>${{ "%.2f"|format(sale.price) }}</span>
+            </div>
+
+             <div class="order-item">
+                <span>Purchase Date:</span>
+                <span>{{ sale.purchase_date.strftime('%B %d, %Y at %I:%M %p') }}</span>
+             </div>
+
+             <div class="total">
+                 <strong>Your QR Code:</strong>
+             </div>
+
+             <div class="qr-code-container">
+                 <img src="data:image/png;base64,{{ qr_code }}" alt="Ticket QR Code">
+                 <p>Please present this QR code at the event entrance.</p>
+             </div>
+         </div>
+
+         <a href="{{ url_for('homepage') }}" class="btn-home">Return to Homepage</a>
+     </div>
+
+     <footer>
+         <p>&copy; {{ current_year }} TicketWave. All rights reserved.</p>
+     </footer>
+
+     <!-- Optional JavaScript to dynamically set the current year -->
+     <script>
+         document.addEventListener("DOMContentLoaded", function() {
+             const currentYear = new Date().getFullYear();
+             document.querySelector("footer p").innerHTML = document.querySelector("footer p").innerHTML.replace("{{ current_year }}", currentYear);
+         });
+     </script>
+</body>
+</html>

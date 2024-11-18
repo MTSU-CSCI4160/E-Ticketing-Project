@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - TicketWave</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3a4cb1;
+            --secondary-color: #00c9a7;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .info-item {
+            flex-basis: 30%;
+            text-align: center;
+        }
+
+        .info-item i {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid var(--light-gray);
+        }
+
+        textarea {
+            resize: vertical; /* Allow vertical resizing */
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #2c3e50; /* Darker shade on hover */
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-color);
+        }
+        
+        /* Map styles */
+        .map-container {
+            width: 100%;
+            height: 300px; /* Fixed height for the map */
+            margin-top: 1rem; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Contact Us</h1>
+
+        <div class="contact-info">
+            <div class="info-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <h3>Address</h3>
+                <p>123 TicketWave Lane<br>Cityville, ST, 12345</p>
+            </div>
+            
+            <div class="info-item">
+                <i class="fas fa-phone-alt"></i>
+                <h3>Phone</h3>
+                <p>(123) 456-7890</p>
+                <p>(987) 654-3210</p>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-envelope"></i>
+                <h3>Email</h3>
+                <p><a href="mailto:support@ticketwave.com">support@ticketwave.com</a></p>
+                <p><a href="mailto:sales@ticketwave.com">sales@ticketwave.com</a></p>
+            </div>
+        </div>
+
+        <h2>Get in Touch</h2>
+        
+        <form action="#" method="post">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required placeholder="Your Name">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required placeholder="Your Email">
+            </div>
+
+           <div class="form-group">
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" rows="4" required placeholder="Your Message"></textarea>
+           </div>
+
+           <button type="submit">Send Message</button>
+       </form>
+
+       <!-- Placeholder for Google Maps -->
+       <h2>Our Location</h2>
+       <div class="map-container">
+           <!-- Replace with your actual Google Maps embed link -->
+           <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509155!2d144.9537353153168!3d-37.81627997975157!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11e8b7%3A0x5045675218ce6e5d!2sTicketWave%20Headquarters!5e0!3m2!1sen!2sau!4v1616161616161!5m2!1sen!2sau"
+               width="100%" height="300" style="border:none;" allowfullscreen="" loading="lazy"></iframe>
+       </div>
+
+   </div>
+
+   <footer>
+       <p>&copy; {{ current_year }} TicketWave. All rights reserved.</p>
+   </footer>
+
+   <!-- Optional JavaScript to dynamically set the current year -->
+   <script>
+       document.addEventListener("DOMContentLoaded", function() {
+           const currentYear = new Date().getFullYear();
+           document.querySelector("footer p").innerHTML = document.querySelector("footer p").innerHTML.replace("{{ current_year }}", currentYear);
+       });
+   </script>
+
+</body>
+</html>

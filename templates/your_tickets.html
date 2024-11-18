@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Tickets - TicketWave</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3a4cb1; /* Primary color */
+            --secondary-color: #00c9a7;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+            --header-background-color: #3a4cb1; /* Match header to primary color */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .header {
+            background-color: var(--header-background-color);
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin-bottom: 0.5rem; /* Space below the heading */
+        }
+
+        .header p {
+            margin-top: 0; /* Remove top margin for paragraph */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .toggle-home {
+            display: flex;
+            justify-content: flex-end; /* Align to the right */
+            margin-bottom: 1rem;
+        }
+
+        .btn-view {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+
+        .btn-view:hover {
+            background-color: #00b894; /* Darker shade on hover */
+            transform: translateY(-2px);
+        }
+
+        .btn-download {
+            display: inline-block;
+            background-color: var(--primary-color); /* Blue color for download button */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .btn-download:hover {
+            background-color: #2c3e50; /* Darker shade on hover */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 1rem; /* Increased padding for better spacing */
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .qr-code-container {
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .qr-code-container img {
+            width: 150px; /* Increased size for better visibility */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>TicketWave</h1>
+        <p>Your Ultimate E-Ticketing Platform</p>
+    </header>
+
+    <div class="container">
+        <div class="toggle-home">
+            <a href="{{ url_for('homepage') }}" class="btn-view">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+
+        <h1>Your Tickets</h1>
+        
+        {% if tickets %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Number of Tickets</th>
+                    <th>Total Price</th>
+                    <th>QR Code</th>
+                    <th>Download QR Code</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td>{{ ticket.event_name }}</td>
+                    <td>{{ ticket.event_date.strftime('%B %d, %Y at %I:%M %p') }}</td>
+                    <td>{{ ticket.number_of_tickets }}</td>
+                    <td>${{ "%.2f"|format(ticket.price) }}</td>
+                    <td class="qr-code-container">
+                        <img src="data:image/png;base64,{{ ticket.qr_code }}" alt="Ticket QR Code">
+                    </td>
+                    <td><a href="data:image/png;base64,{{ ticket.qr_code }}" download="ticket_{{ ticket.event_id }}.png" class="btn-download">Download</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+        <p>No tickets purchased yet.</p>
+        {% endif %}
+    </div>
+
+    <footer>
+        <p>&copy; {{ current_year }} TicketWave. All rights reserved.</p>
+    </footer>
+
+    <!-- Optional JavaScript to dynamically set the current year -->
+    <script>
+         document.addEventListener("DOMContentLoaded", function() {
+             const currentYear = new Date().getFullYear();
+             document.querySelector("footer p").innerHTML = document.querySelector("footer p").innerHTML.replace("{{ current_year }}", currentYear);
+         });
+    </script>
+</body>
+</html>

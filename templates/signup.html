@@ -49,6 +49,7 @@
         .signup-form input[type="email"],
         .signup-form input[type="password"],
         .signup-form input[type="date"],
+        .signup-form select,
         .signup-form button {
             width: calc(100% - 20px);
             padding: 10px;
@@ -91,7 +92,7 @@
     <div class="signup-container">
         <h2>Sign Up</h2>
         <!-- Optional image below title -->
-        <img src="{{ url_for('static', filename='ticketwave.jpeg') }}" alt="Ticketwave Logo">
+        <img src="{{ url_for('static', filename='file.png') }}" alt="Ticketwave Logo">
         
         <form class="signup-form" method="post" action="/signup">
             <label for="first-name">First Name:</label>
@@ -105,6 +106,13 @@
 
             <label for="dob">Date of Birth:</label>
             <input type="date" id="dob" name="dob" required>
+
+            <label for="purpose">What do you plan to do?</label>
+            <select id="purpose" name="purpose" required>
+                <option value="">Select an option</option>
+                <option value="user">Buy Tickets</option>
+                <option value="user+organizer">Organize Events and Buy Tickets</option>
+            </select>
 
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
