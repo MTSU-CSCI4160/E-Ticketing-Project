@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, flash
 import mysql.connector
 from datetime import datetime
 import bcrypt  # Importing bcrypt for password hashing
+import qrcode
+from io import BytesIO
+import base64
 #pip install Flask
 #pip install mysql-connector-python
 #pip install bcrypt
@@ -98,7 +101,7 @@ def events():
     
     # Fetch events with available seats
     cursor.execute("""
-        SELECT name, event_date, location 
+        SELECT name, event_date, location, event_id 
         FROM events 
         WHERE seats_left > 0 
         ORDER BY event_date ASC
@@ -203,11 +206,36 @@ def create_event():
     
     return redirect(url_for('your_events'))
 
-@app.route('/edit_event/<int:event_id>')
+@app.route('/edit_event/<int:event_id>', methods=['GET', 'POST'])
 @login_required
 def edit_event(event_id):
-    # Implement edit event logic
-    pass
+    connection = get_db_connection()
+    
+    if request.method == 'POST':
+        name = request.form['name']
+        date = request.form['date']
+        location = request.form['location']
+        
+        cursor = connection.cursor()
+        cursor.execute("""
+            UPDATE events SET name = %s, event_date = %s, location = %s WHERE event_id = %s
+        """, (name, date, location, event_id))
+        
+        connection.commit()
+        cursor.close()
+        
+        flash('Event updated successfully!', 'success')
+        return redirect(url_for('events'))
+    
+    # If GET request, fetch existing data
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM events WHERE event_id = %s", (event_id,))
+    event = cursor.fetchone()
+    
+    cursor.close()
+    connection.close()
+
+    return render_template('edit_event.html', event=event)  # Render the edit template
 
 @app.route('/delete_event/<int:event_id>')
 @login_required
@@ -215,7 +243,234 @@ def delete_event(event_id):
     # Implement delete event logic
     pass
 
-# Route to logout the user
+
+@app.route('/event_detail/<int:event_id>')
+@login_required
+def event_detail(event_id):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    # Fetch the specific event details
+    cursor.execute("SELECT * FROM events WHERE event_id = %s", (event_id,))
+    event = cursor.fetchone()
+    
+    cursor.close()
+    connection.close()
+    
+    if not event:
+        flash('Event not found', 'error')
+        return redirect(url_for('events'))
+    
+    return render_template('event_detail.html', event=event)
+
+@app.route('/payment/<int:event_id>')
+@login_required
+def payment_page(event_id):
+    quantity = request.args.get('quantity', 1, type=int)
+    
+    # Fetch the event details
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    try:
+        cursor.execute("SELECT * FROM events WHERE event_id = %s", (event_id,))
+        event = cursor.fetchone()
+
+        if not event:
+            flash('Event not found', 'error')
+            return redirect(url_for('events'))
+
+        # Convert event_date to datetime object if it's not already
+        if isinstance(event['event_date'], str):
+            event['event_date'] = datetime.strptime(event['event_date'], '%Y-%m-%d %H:%M:%S')
+
+        return render_template('payment.html', event=event, quantity=quantity)
+
+    finally:
+        cursor.close()
+        connection.close()
+
+@app.route('/confirmation/<int:event_id>')
+@login_required
+def confirmation(event_id):
+    # Fetch event details and recent purchase info
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    cursor.execute("SELECT * FROM events WHERE event_id = %s", (event_id,))
+    event = cursor.fetchone()
+    
+    user_id = session.get('user_id')
+    cursor.execute("""
+        SELECT * FROM purchases 
+        WHERE user_id = %s AND event_id = %s 
+        ORDER BY purchase_date DESC LIMIT 1
+    """, (user_id, event_id))
+    purchase = cursor.fetchone()
+    
+    cursor.close()
+    connection.close()
+    
+    if not event or not purchase:
+        flash('Confirmation information not found', 'error')
+        return redirect(url_for('homepage'))
+    
+    return render_template('confirmation.html', event=event, purchase=purchase)
+
+
+@app.route('/process_payment/<int:event_id>', methods=['POST'])
+@login_required
+def process_payment(event_id):
+    quantity = int(request.form['quantity'])
+    user_id = session.get('user_id')
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        # Start a transaction
+        connection.start_transaction()
+
+        # Fetch event details
+        cursor.execute("SELECT * FROM events WHERE event_id = %s FOR UPDATE", (event_id,))
+        event = cursor.fetchone()
+
+        if not event:
+            raise ValueError("Event not found")
+
+        if event['seats_left'] < quantity:
+            raise ValueError("Not enough seats available")
+
+        # Calculate total price
+        total_price = event['ticket_price'] * quantity
+
+        cursor.execute("UPDATE events SET seats_sold = seats_sold + %s WHERE event_id = %s", 
+                       (quantity, event_id))
+
+        # Generate QR code
+        qr_data = f"User ID: {user_id}, Event ID: {event_id}, Tickets: {quantity}, Total: ${total_price}"
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(qr_data)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        # Convert QR code to bytes
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        qr_code_binary = buffered.getvalue()
+
+        # Insert sales record
+        cursor.execute("""
+            INSERT INTO sales (user_id, event_id, price, number_of_tickets, qr_code)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (user_id, event_id, total_price, quantity, qr_code_binary))
+
+        # Commit the transaction
+        connection.commit()
+
+        flash('Ticket purchased successfully!', 'success')
+        return redirect(url_for('ticket_confirmation', sale_id=cursor.lastrowid))
+
+    except ValueError as e:
+        connection.rollback()
+        flash(str(e), 'error')
+        return redirect(url_for('event_detail', event_id=event_id))
+
+   # except Error as e:
+      #  connection.rollback()
+      #  flash('An error occurred while processing your purchase', 'error')
+      #  return redirect(url_for('event_detail', event_id=event_id))
+
+    finally:
+        cursor.close()
+        connection.close()
+
+@app.route('/ticket_confirmation/<int:sale_id>')
+@login_required
+def ticket_confirmation(sale_id):
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        # Fetch sales details
+        cursor.execute("""
+            SELECT s.*, e.name as event_name, e.event_date
+            FROM sales s
+            JOIN events e ON s.event_id = e.event_id
+            WHERE s.ticket_id = %s AND s.user_id = %s
+        """, (sale_id, session.get('user_id')))
+        sale = cursor.fetchone()
+
+        if not sale:
+            flash('Sale record not found', 'error')
+            return redirect(url_for('homepage'))
+
+        # Convert binary QR code to base64 for displaying in HTML
+        qr_code_base64 = base64.b64encode(sale['qr_code']).decode('utf-8')
+
+        return render_template('ticket_confirmation.html', sale=sale, qr_code=qr_code_base64)
+
+    #except Error as e:
+     #   flash('An error occurred while fetching sale details', 'error')
+     #   return redirect(url_for('homepage'))
+
+    finally:
+        cursor.close()
+        connection.close()
+
+
+@app.route('/your_tickets')
+@login_required
+def your_tickets():
+    user_id = session.get('user_id')
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT s.*, e.name AS event_name, e.event_date
+            FROM sales s
+            JOIN events e ON s.event_id = e.event_id
+            WHERE s.user_id = %s
+        """, (user_id,))
+        
+        tickets = cursor.fetchall()
+        
+        # Convert QR code from binary to base64 for rendering
+        for ticket in tickets:
+            ticket['qr_code'] = base64.b64encode(ticket['qr_code']).decode('utf-8')
+
+        return render_template('your_tickets.html', tickets=tickets)
+
+    finally:
+        cursor.close()
+        connection.close()
+
+
+# Route for the Contact Us page
+@app.route('/contact_us')
+def contact():
+    return render_template('contact_us.html')
+
+# Route to handle form submission
+@app.route('/submit_contact', methods=['POST'])
+def submit_contact():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    message = request.form.get('message')
+
+    # Here you would typically process the data (e.g., save it to a database or send an email)
+    # For demonstration purposes, we'll just print it to the console
+    print(f"Name: {name}, Email: {email}, Message: {message}")
+
+    # Flash a success message
+    flash('Your message has been sent successfully!', 'success')
+    
+    # Redirect back to the contact page (or you could redirect to a thank you page)
+    return redirect(url_for('contact_us'))
+
+# route to log out user
 @app.route('/logout')
 def logout():
     session.pop('user', None)  # Clear the session
