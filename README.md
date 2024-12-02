@@ -122,7 +122,7 @@ python app.py
 Once the application loads up navigate to Signup page from there and sign up as a Organize Events and Buy Tickets.
 
 ## Project Structure
-supplier-shipment-app/
+Ticketwave/
 │
 ├── app.py               # Main Flask application
 ├── templates/
